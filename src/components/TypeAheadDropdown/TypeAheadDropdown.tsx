@@ -1,20 +1,32 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
 import "./TypeAheadDropdown.css";
 
+import { useDebounce } from "../../utils/debounceHook";
+import axios from "axios";
+
 export const TypeAheadDropdown = ({ items }: any): JSX.Element => {
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [text, setText] = useState("");
 
-  const onTextChange = (e: any) => {
-    let suggestions = [];
-    const value = e.target.value;
-    if (value.length > 0) {
-      const regex = new RegExp(`^${value}`, `i`);
-      suggestions = items.sort().filter((v: string) => regex.test(v));
+  const debouncedSearchTerm = useDebounce(text, 1000);
+
+  useEffect(() => {
+    let suggestions: any[] = [];
+    async function searchCountries(text: string) {
+      const { data } = await axios.get(
+        `https://restcountries.eu/rest/v2/name/${text}`
+      );
+      suggestions = data.map((country: any) => country.name);
+      setSuggestions(suggestions);
     }
 
-    setSuggestions(suggestions);
+    if (text.length > 0) {
+      searchCountries(text);
+    }
+  }, [debouncedSearchTerm]);
+
+  const onTextChange = (e: any) => {
+    const { value } = e.target;
     setText(value);
   };
 
@@ -24,7 +36,6 @@ export const TypeAheadDropdown = ({ items }: any): JSX.Element => {
   };
 
   const renderSuggestions = () => {
-    console.log("suggestions :", suggestions);
     if (suggestions.length === 0) {
       return null;
     }
