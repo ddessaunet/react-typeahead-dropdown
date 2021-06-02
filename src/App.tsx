@@ -7,7 +7,7 @@ export default function App() {
   return (
     <div className="App">
       <h1>TypeAheadDropdown component</h1>
-      <TypeAheadDropDown items={cities} />
+      <TypeAheadDropDown />
     </div>
   );
 }

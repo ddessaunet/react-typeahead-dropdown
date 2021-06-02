@@ -22,6 +22,8 @@ export const TypeAheadDropdown = ({ items }: any): JSX.Element => {
 
     if (text.length > 0) {
       searchCountries(text);
+    } else {
+      setSuggestions([]);
     }
   }, [debouncedSearchTerm]);
 
